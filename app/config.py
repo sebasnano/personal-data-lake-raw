@@ -16,6 +16,10 @@ class Settings(BaseSettings):
     app_env: str = "development"
     app_version: str = "0.1.0"
 
+    # Used when the API runs behind a reverse proxy with a path prefix.
+    # Example in code-server: /proxy/8000
+    app_root_path: str = ""
+
     model_config = SettingsConfigDict(
         env_file=".env",
         env_file_encoding="utf-8",
