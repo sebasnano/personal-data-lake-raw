@@ -7,18 +7,27 @@ class Settings(BaseSettings):
     """
     Central application settings.
 
-    This class reads configuration values from environment variables or from a
-    local `.env` file. Keeping configuration centralized makes the project
-    easier to run in development, quality, and production environments.
+    Settings are loaded from environment variables or from a local `.env` file.
+    This makes the same codebase usable in development, quality, and production
+    environments without hardcoding infrastructure values.
     """
 
+    # Application settings
     app_name: str = "personal-data-lake-api"
     app_env: str = "development"
     app_version: str = "0.1.0"
 
-    # Used when the API runs behind a reverse proxy with a path prefix.
+    # Optional root path used when the API runs behind a path-based proxy.
     # Example in code-server: /proxy/8000
     app_root_path: str = ""
+
+    # MinIO settings
+    # MinIO is the RAW object storage layer of the data lake.
+    minio_endpoint: str = "minio:9000"
+    minio_access_key: str = "change_me"
+    minio_secret_key: str = "change_me"
+    minio_bucket_raw: str = "raw"
+    minio_secure: bool = False
 
     model_config = SettingsConfigDict(
         env_file=".env",
@@ -32,7 +41,8 @@ def get_settings() -> Settings:
     """
     Return cached application settings.
 
-    The cache prevents reading the environment repeatedly on every request.
-    This will also be useful later for database and object storage settings.
+    The cache avoids reading environment variables repeatedly during the app
+    lifecycle. This is useful for routes, storage clients, and future database
+    connections.
     """
     return Settings()
