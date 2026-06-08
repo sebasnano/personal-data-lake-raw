@@ -1,0 +1,28 @@
+services:
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        # Production-like image only installs runtime dependencies.
+        REQUIREMENTS_FILE: requirements.txt
+
+    container_name: personal-data-lake-api
+
+    ports:
+      - "${APP_PORT:-8000}:8000"
+
+    environment:
+      APP_NAME: ${APP_NAME:-personal-data-lake-api}
+      APP_ENV: ${APP_ENV:-production}
+      APP_VERSION: ${APP_VERSION:-0.1.0}
+
+    restart: unless-stopped
+
+    healthcheck:
+      # Uses Python instead of curl to avoid installing extra OS packages.
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s

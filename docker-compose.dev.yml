@@ -1,0 +1,38 @@
+services:
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        # Development image includes pytest and httpx.
+        REQUIREMENTS_FILE: requirements-dev.txt
+
+    container_name: personal-data-lake-api-dev
+
+    # Development command with auto-reload enabled.
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+
+    ports:
+      - "${APP_PORT:-8000}:8000"
+
+    environment:
+      # These values can be overridden by a local .env file or shell variables.
+      APP_NAME: ${APP_NAME:-personal-data-lake-api}
+      APP_ENV: ${APP_ENV:-development}
+      APP_VERSION: ${APP_VERSION:-0.1.0}
+
+    volumes:
+      # Mount source code to enable live reload while coding.
+      - ./app:/code/app
+
+      # Mount tests and pytest configuration for local validation.
+      - ./tests:/code/tests
+      - ./pytest.ini:/code/pytest.ini:ro
+
+    healthcheck:
+      # Uses Python instead of curl to keep the image minimal.
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
