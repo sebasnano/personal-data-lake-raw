@@ -389,3 +389,21 @@ Este proyecto también funciona como práctica aplicada de:
 ## Licencia
 
 Proyecto personal en desarrollo.
+
+---
+
+## MinIO RAW Object Storage
+
+The project uses MinIO as the RAW object storage layer.
+
+MinIO is used to store original files before any transformation or ETL process.
+
+Storage health check:
+
+```http
+GET /health/storage
+
+More details:
+
+docs/minio-storage.md
+

@@ -16,6 +16,17 @@ services:
       APP_NAME: ${APP_NAME:-personal-data-lake-api}
       APP_ENV: ${APP_ENV:-production}
       APP_VERSION: ${APP_VERSION:-0.1.0}
+      APP_ROOT_PATH: ${APP_ROOT_PATH:-}
+
+      # MinIO connection used by the API.
+      MINIO_ENDPOINT: ${MINIO_ENDPOINT:-minio:9000}
+      MINIO_ACCESS_KEY: ${MINIO_ACCESS_KEY:-minioadmin}
+      MINIO_SECRET_KEY: ${MINIO_SECRET_KEY:-minioadmin}
+      MINIO_BUCKET_RAW: ${MINIO_BUCKET_RAW:-raw}
+      MINIO_SECURE: ${MINIO_SECURE:-false}
+
+    depends_on:
+      - minio
 
     restart: unless-stopped
 
@@ -26,3 +37,26 @@ services:
       timeout: 5s
       retries: 3
       start_period: 10s
+
+  minio:
+    image: minio/minio:latest
+    container_name: personal-data-lake-minio
+
+    command: server /data --console-address ":9001"
+
+    ports:
+      - "9000:9000"
+      - "${MINIO_CONSOLE_PORT:-9001}:9001"
+
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ACCESS_KEY:-minioadmin}
+      MINIO_ROOT_PASSWORD: ${MINIO_SECRET_KEY:-minioadmin}
+
+    volumes:
+      # Persistent object storage data.
+      - minio-data:/data
+
+    restart: unless-stopped
+
+volumes:
+  minio-data:
